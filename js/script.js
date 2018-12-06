@@ -3,22 +3,6 @@ $(document).ready(function () {
   var $window = $(window);
 
 //============================================================================
-//  SLIDING MENU
-//============================================================================
-  $('.menu-overlay').click(function () {
-    $('.wrapper').removeClass('open-menu');
-  });
-  $('#mobile-menu-btn').click(function () {
-    if (!$('.wrapper').hasClass('open-menu')) {
-      $('.wrapper').addClass('open-menu');
-    }
-    else {
-      $('.wrapper').removeClass('open-menu');
-    }
-    return false;
-  });
-
-//============================================================================
 //  NAV MOVING
 //============================================================================
   /*function navMove(){
@@ -67,11 +51,11 @@ $(document).ready(function () {
 //============================================================================
 //  AJAX
 //============================================================================
-  $('.btn-ajax-1').click(function () {
+  $('.btn-ajax-1').on('click', function () {
     $('.wrap-ajax').load('ajax/ajax_1.html');
   });
 
-  $('.btn-ajax-2').click(function () {
+  /*$('.btn-ajax-2').on('click', function () {
     $.ajax({
       url: 'ajax/ajax_2.json',
       dataType: 'text',
@@ -80,7 +64,47 @@ $(document).ready(function () {
         $('.wrap-ajax').html(JSON.parse(jsondata).address.streetAddress);  //---> парсинг файла c выборкой адресса
       }
     });
-  });
+  });*/ //код ниже реализует то же самое только без JQuery
+
+  var btnAjax = document.querySelector('.btn-ajax-2'),
+      containerAjax = document.querySelector('.wrap-ajax');
+  btnAjax.addEventListener('click', ajaxRequestJSON); // обработка JSON
+  //btnAjax.addEventListener('click', ajaxRequestXML); // обработка XML
+
+  function ajaxRequestJSON () {
+    var request = new XMLHttpRequest();
+    request.open('GET', 'ajax/ajax_2.json', true);
+	
+	request.send();
+
+    request.onload = function (event) {     //в event приходит событие, в данном случае Load
+      if (request.status === 200) {
+        containerAjax.innerText = JSON.parse(request.responseText)[0].powers[1];  //парсим JSON данные и выбираем нужные данные, и вставляем в нужное место
+      }
+      else {
+        alert('Request failed.  Returned status of ' + request.status);
+      }
+    };
+  }
+
+  function ajaxRequestXML () {
+    var request = new XMLHttpRequest();
+    request.open('GET', 'ajax/account.xml', true);
+	
+	request.send();
+
+    request.onload = function (event) {     // в event приходит событие, в данном случае Load
+      if (request.status === 200) {
+        //var xmlStr = request.responseText; // полученные данные в виде текста
+        //var xmlDoc = new DOMParser().parseFromString(xmlStr ,'text/html'); // преобразовываем данные c строки в [object HTMLDocument]
+        var xml = request.responseXML; // полученные данные сразу в виде XML
+        containerAjax.innerText = xml.getElementsByTagName('friend')[1].innerHTML; // Mary  (по тег нейму делаем выбокку, второй элемент в коллекции, текст)
+      }
+      else {
+        alert('Request failed.  Returned status of ' + request.status);
+      }
+    };
+  }
 
 //============================================================================
 //  DRAG & DROP
@@ -390,121 +414,6 @@ $(document).ready(function () {
    console.log(persent + '% ', result);*/
 
 //============================================================================
-//  __PROTO__ PROTOTYPE
-//============================================================================
-// создание класса Animal с методом skills
-  function Animals(name) {
-    this.name = name;
-    this.skills = function () {
-      return 'Jump';
-    }
-  }
-
-// добавление метода move в класс Animals
-  Animals.prototype.move = function () {
-    return 'default Animal speed';
-  };
-
-// создание нового обьекта из класса Animal
-  var cat = new Animals('Murka');
-
-  console.log(cat.name, cat.skills(), cat.move());
-  // --> Murka, Jump, default Animal speed
-  //все параметры кроме name берутся из прототипа так как собственных нету.
-
-// добавление собственного метода move конкретно данному обьекту cat
-  cat.move = function () {
-    return this.name + ' so fast';
-  };
-
-  console.log(cat.move(), cat.__proto__.move());
-  // --> Murka so fast, default Animal speed
-  //первый move-собственный, второй move-получаем с прототипа
-
-// перезапись свойств метода move в прототипе обьекта cat
-  cat.__proto__.move = function () {
-    return 'new Animal speed';
-  };
-
-  console.log(cat.move(), cat.__proto__.move());
-  // --> Murka so fast, new Animal speed
-  //первый move-собственный, второй move-получаем с прототипа (обновленный)
-
-////////////////////////////////////////////////////////////////////////////
-
-//создание обьекта animal
-  var animal = {
-    walk: function () {
-      return 'Animal';
-    }
-  };
-
-//создание обьекта rabbit, и присвоение его прототипом обьекта animal
-  var rabbit = {
-    __proto__: animal,
-    walk: function () {
-      return 'Rabbit';
-    }
-  };
-
-  console.log(rabbit.walk(), rabbit.__proto__.walk());
-  // --> Rabbit, // --> Animal
-
-////////////////////////////////////////////////////////////////////////////
-
-  function Product(name, price) {
-    //2 Object{}
-    this.name = name;
-    this.price = price;
-    //3 Object { name: "cheese", price: 50 }
-    this.cell = function () {
-      return this.name + ' cell for ' + this.price;
-    };
-    //4 Object { name: "cheese", price: 50, cell: Product/this.cell() }
-  }
-
-  /*Product.prototype.cell = function () {
-      return this.name + ' cell for ' + this.price;
-  };   через такой вариант cell не передается*/
-
-  function Food(name, price) {
-    //1 Object{}
-    Product.call(this, name, price);
-    //5 Object { name: "cheese", price: 50, cell: Product/this.cell() }
-    this.category = 'food';
-    //6 Object { name: "cheese", price: 50, , cell: Product/this.cell(), category: "food" }
-  }
-
-  var food = new Food('cheese', 50);
-
-  console.log(food.cell());
-  // -->  cheese cell for 50
-
-//============================================================================
-//  VALIDATION FORM
-//============================================================================
-  /*var form = document.forms['form_login']['form_login_pass'];
-  document.forms выводит массив с всеми формами, в которых массивы со всеми инпутами
-  данная запись forms['форма']['инпут'] ищет конкретное поле в конкретной форме.*/
-
-  var loginSubmit = document.querySelector('#form_login .submit');
-  loginSubmit.addEventListener('click', validateForm);
-
-  function validateForm() {
-    var form = this.closest('form');
-    var pass = form.querySelector('#form_login_pass');
-
-    if (pass.value.length < 3) {
-      pass.classList.add('error');
-      return false;  // blocking Form, NOT submit!
-    }
-    else {
-      pass.classList.remove('error');
-      // submit Form
-    }
-  }
-
-//============================================================================
 //  ABOUT OBJECT
 //============================================================================
   /*var object1 = Object.create(null);   // Создаем пустой обьект, вобще без аргументов нельзя поэтому используем в качестве аргумента null
@@ -534,8 +443,302 @@ $(document).ready(function () {
   console.log( object3.name );   // --> Obj2*/
 
 //============================================================================
+//  CALLBACK Function
+//============================================================================
+  /*Использование функ., переданной в качестве аргумента, внутри другой функ.
+   функ. total передаем все переменные a,b,c,d и обе функции общета sum и sum2 (в переменных callback, callback2),
+  внутри total сортируем переменные по callback функциям и создаем локальную переменную f
+  и так же ее передаем в цунк. колбеков*/
+  var sum = function (a, b, f) {
+    return (a + b) * f;
+    // (1 + 2) * 5 = 15
+  };
+  var sum2 = function (c, d, f) {
+    return (c * d) - f;
+    // (3 + 4) - 5 = 7
+  };
+  var total = function (a,b,c,d, callback, callback2) {
+    var f = 5;
+    return callback(a,b, f) + callback2(c,d, f);
+    // 15 + 7 = 22
+  };
+  console.log( total(1,2,3,4, sum, sum2) ); // --> 22
+
+//============================================================================
+//  __PROTO__ PROTOTYPE
+//============================================================================
+//создание обьекта animal
+  var animal = {
+    walk: function () {
+      return 'Animal';
+    }
+  };
+
+//создание обьекта rabbit, и присвоение его прототипом обьекта animal
+  var rabbit = {
+    __proto__: animal,
+    walk: function () {
+      return 'Rabbit';
+    }
+  };
+
+  console.log(rabbit.walk(), rabbit.__proto__.walk());
+  // --> Rabbit, // --> Animal
+
+//////////////////////////////////////////////
+
+// создание класса Animal
+  function Animals(name) {
+    this.name = name;
+    this.skills = function () {
+      return 'Jump';
+    }
+  }
+
+// добавление метода move в класс Animals
+  Animals.prototype.move = function () {
+    return 'default Animal speed';
+  };
+
+// создание нового обьекта из класса Animal
+  var cat = new Animals('Murka');
+
+  console.log(cat.name, cat.skills(), cat.move());
+  // --> Murka, Jump, default Animal speed
+  //параметр move берется из прототипа так как собственного нету.
+
+// добавление собственного метода move конкретно данному обьекту cat
+  cat.move = function () {
+    return this.name + ' so fast';
+  };
+
+  console.log(cat.move(), cat.__proto__.move());
+  // --> Murka so fast, default Animal speed
+  //первый move-собственный, второй move-получаем с прототипа
+
+// перезапись свойств метода move в прототипе обьекта cat
+  cat.__proto__.move = function () {
+    return 'new Animal speed';
+  };
+
+  console.log(cat.move(), cat.__proto__.move());
+  // --> Murka so fast, new Animal speed
+  //первый move-собственный, второй move-получаем с прототипа (обновленный)
+
+  //создаем другой клас Fish и обьект от него fish
+  function Fish(name) {
+    this.name = name;
+  }
+  //в прототип класса Fish назначаем свойства обьекта cat, то есть fish наследуется от cat
+  Fish.prototype = cat;
+
+  var fish = new Fish('Kambala');
+
+  console.log(fish.name, fish.__proto__.name, fish.move());
+  // --> Kambala,  Murka,  Kambala so fast
+  // последнее свойство move взято в прототипе (унаследовано от обьекта cat)
+
+////////////////////////////////////////////////////////////////////////////
+  /*схема вызова callback функ. для классов.
+    function SomeClass(_arg1, _arg2) {
+      Parent1.call(this, _arg1);
+      Parent2.call(this, _arg2);
+      //далее, собственные методы и свойства SomeClass
+    }
+    интересный тип наследования без прототайпа...
+    чрезвычайно простая и наглядная методика, не требующая дополнительных сущностей,
+    и к тому же, позволяющая множественное наследование, по необходимости.*/
+
+  function ParentSEX(sex) {
+    this.sex = sex;
+  }
+  function ParentAGE(age) {
+    this.age = age;
+  }
+  function SomeClass(_sex, _age, name) {
+    ParentSEX.call(this, _sex);           //в this находится передаваемый обьект (someObj), sex - аргумент для функ.ParentSEX
+    ParentAGE.call(this, _age);
+
+    this.name = name;                     //- публичная переменная (public)
+    var cock = 32;                        //- приватная переменная (private), доступна только внутри данной функ.
+    var resume = function () {            //- приватная функция (private), доступна только внутри данной функ.
+      return name + _age + _sex + cock;
+    };
+    this.getResume = resume();            //доступ к результатам функ resume извне.
+  }
+  var someObj = new SomeClass('male', 27, 'John');
+
+  console.log(someObj);
+  //---> Object { sex: "male", age: 27, name: "John", getResume: "John27male32" }
+  console.log(someObj.name, someObj.cock, someObj.getResume);
+  //---> John,  undefined (потому что private),  John27male32
+
+//============================================================================
+//  FABRIC
+//============================================================================
+// создаем функцию которая возвращает обьект с параметрами
+  function ParentClass(name) {
+    var speed = 10;
+    return {
+      name: name,
+      run: function (distance) {
+        return distance/speed + '-секунд';
+      }
+    }
+  }
+  var parentObj = ParentClass('Animal');
+
+  console.log(parentObj.run(1000));
+  //---> 100
+
+  function ChildClass(name) {
+    //принимаем родительский обьект со всеми его свойствами
+    var parent = ParentClass(name);
+    //добавляем свойств которые должны быть у наследника
+    var jumps = 1;
+    parent.jump = function() {
+      jumps++;
+    };
+    parent.getJumps = function() {
+      return jumps
+    };
+    // поставить правильное свойство конструктора
+    // (делаем вид, что объект создали мы, а не ParentClass)
+    //этот пункт не обязателен, но он позволяет в будущем проводить сравнение обьекта через его прототип.
+    parent.constructor = arguments.callee;
+
+    //возвращаем готовый обьект с общими всеми свойствами
+    return parent;
+  }
+  var childObj = ChildClass('Rabbit');
+  //alert(childObj.constructor === ChildClass); // => true
+
+  console.log(childObj.name, childObj.run(1000), childObj.jump(), childObj.getJumps());
+  //---> Rabbit,  100-секунд,  undefined,  2
+  //третий пункт- функ. отрабатывает но она ничего не выводит по этому мы видим undefined
+  //а вот последняя функ. как раз делает вывод результата работы предыдущей функ. через return
+
+  /*как это все работает?
+    Фактически, функция берет другой объект и добавляет ему свои методы.
+    Из-за этого такую реализацию наследования иногда называют "паразитическим наследованием".
+  */
+
+//============================================================================
+//  VALIDATION FORM
+//============================================================================
+  /*var form = document.forms['form_login']['form_login_pass'];
+  document.forms выводит массив с всеми формами, в которых массивы со всеми инпутами
+  данная запись forms['форма']['инпут'] ищет конкретное поле в конкретной форме.*/
+
+  var loginSubmit = document.querySelector('#form_login .submit');
+  loginSubmit.addEventListener('click', validateForm);
+
+  function validateForm() {
+    var form = this.closest('form');
+    var pass = form.querySelector('#form_login_pass');
+
+    if (pass.value.length < 3) {
+      pass.classList.add('error');
+      return false;  // blocking Form, NOT submit!
+    }
+    else {
+      pass.classList.remove('error');
+      // submit Form
+    }
+  }
+
+//============================================================================
+//  SCOPE (область видимости в ангулар)
+//============================================================================
+  var scope = [{'close':'cap', 'color':'red', 'size':'S'}, {'close':'cap', 'color':'blue', 'size':'XL'}];
+  //в scope сейчас находятся 2 обьекта с параметрами, функ. funcClothes мы вносим изменения (все имена произвольны.)
+  function funcClothes( scope ) {
+    scope[1].size = 'XXXL'; // Change size in second object from "L" to "XXXL"
+    scope.push( {'close':'cap', 'color':'green', 'size':'L'} ); // Add to Scope new object
+  }
+  funcClothes( scope );
+
+  console.log(scope); // Now 3 object into Scope
+  console.log(scope[1].size); // XXXL
+
+//============================================================================
+//  EVENT LOOP (цикл событий в JS)
+//============================================================================
+  /*Цикл событий решает одну основную задачу: наблюдает за стеком вызовов и очередью коллбэков (callback queue).
+  Если стек вызовов пуст, цикл берёт первое событие из очереди и помещает его в стек,
+  что приводит к запуску этого события на выполнение.
+  Подобная итерация называется тиком (tick) цикла событий. Каждое событие — это просто коллбэк.
+  Call Stack (стек вызовов)  -- WEB API (api браузера, например таймер)  -- Callback Queue (очередь колбеков)
+  Рассмотрим следующий пример при использовании функ. setTimeout:
+  функ. setTimeout(myCallback, 1000) попадает в стек вызовов -->
+  отрабатывает и включается таймер в браузере -->
+  функ. завершила работу и удаляется из стека вызовов -->
+  таймер завершает работу и помещает коллбэк myCallback в очередь коллбэков. -->
+  цикл событий берёт функ. из очереди коллбэков myCallback и помещает её в стек вызовов -->
+  функ. выполняется --> удаляется с стека вызовов.
+  */
+
+
+  // можна заменить циклом for
+
+//REDUCE - сумирование
+  var arr = [1,2,3,4,5];
+  var myReduce = arr.reduce(
+    function (a, b) {
+      return a + b;
+    }
+  );
+  //REDUCE - проходит по всем елем циклом
+  //возвращает результат сумирования массива.
+  console.log(myReduce);  //--> 15
+
+  //MAP - преобразование
+  var myMap = arr.map(
+    function (elem) {
+      return elem * 2;
+    }
+  );
+  //elem - каждый елемент в массиве, MAP - проходит по всем елем циклом
+  //возвращает массив той же длины но уже обработанный, по сути новый массив.
+  console.log(myMap);  // --> [2,4,6,8,10]
+
+  //FILTER - фильтрация
+  var myFilter = arr.filter(
+    function (elem) {
+      return elem > 1 && elem < 5;
+    }
+  );
+  //elem - каждый елемент в массиве, FILTER - проходит по всем елем циклом
+  //возвращает массив любой длины и уже обработанный, по сути новый массив.
+  console.log(myFilter);  // --> [2,3,4]
+  
+  
+//============================================================================
 //  TEST SECTION
 //============================================================================
+
+  // var factory = 1;
+  //
+  // (function (factory) {
+  //   if (typeof define === 'function' && define.amd) {
+  //     // AMD
+  //     define(['jquery'], factory);
+  //   }
+  //   else if (typeof exports === 'object') {
+  //     // CommonJS
+  //     factory(require('jquery'));
+  //   }
+  //   else {
+  //     // Browser globals
+  //     factory(jQuery);
+  //   }
+  // })(factory);
+
+  var result1 = 3 > 4?'Ok':3 > 3?'No':'Else';   // Else
+  var result2 = 3 > 2?'Ok':'Else';              // Ok
+  console.log(result1, result2);
+  
+
 
 
 });

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Some comments here -->
+<account>
+	<photos>
+		<photo title="photo1"/>
+		<photo title="photo2"/>
+	</photos>
+	<friends>
+		<friend sex="male">John</friend>
+		<friend sex="female">Mary</friend>
+	</friends>
+</account>

@@ -1,13 +1,22 @@
-    {
-       "firstName": "Иван",
-       "lastName": "Иванов",
-       "address": {
-           "streetAddress": "Московское ш., 101, кв.101",
-           "city": "Ленинград",
-           "postalCode": 101101
-       },
-       "phoneNumbers": [
-           "812 123-1234",
-           "916 123-4567"
-       ]
-    }
+[
+  {
+    "name": "Molecule Man",
+    "age": 29,
+    "secretIdentity": "Dan Jukes",
+    "powers": [
+      "Radiation resistance",
+      "Turning tiny",
+      "Radiation blast"
+    ]
+  },
+  {
+    "name": "Madame Uppercut",
+    "age": 39,
+    "secretIdentity": "Jane Wilson",
+    "powers": [
+      "Million tonne punch",
+      "Damage resistance",
+      "Superhuman reflexes"
+    ]
+  }
+]
