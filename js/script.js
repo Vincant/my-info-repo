@@ -377,7 +377,7 @@ $(document).ready(function () {
     shootResult();
   };
   // создание новых обьектов (орудий)из класса Guns
-  var pzIIIGun = new Guns('Kwk39', 50, 96);
+  var pzIIIGun = new Guns('Kwk39', 50, 86);
   var tigerGun = new Guns('Acht-Acht', 88, 145);
 
   // определение типа орудия из которого ведется огонь и растояние до цели
@@ -438,7 +438,7 @@ $(document).ready(function () {
   но если таковы уже есть в копируемом обьекте object1 или object1 то они попросту проигнорируются и перезапишутся
   то есть добавив {weight: 100, name: 'Obj3'} параметр веса добавится,
   а парамент имени проигнорируется и возьмется с копии. Будет все равно Obj2 (параметр последнего в списке обьекта а именно object2)
-  обьектов может быть сколько угодлно: object1, object2, object3 ... и так далее.
+  обьектов может быть сколько угодно: object1, object2, object3 ... и так далее.
 
   console.log( object3.name );   // --> Obj2*/
 
@@ -463,10 +463,31 @@ $(document).ready(function () {
     // 15 + 7 = 22
   };
   console.log( total(1,2,3,4, sum, sum2) ); // --> 22
+//------------------------------------------------------------------------------
+  /*1. Function Declaration – функция, объявленная в основном потоке кода.
+        function sum(a, b) {
+          return a + b;
+        }
+    2. Function Expression – объявление функции в контексте какого-либо выражения, например присваивания.
+        var sum = function(a, b) {
+          return a + b;
+        }
+    Но делают по сути одно и то же
+
+    Основное отличие между ними: функции, объявленные как Function Declaration, создаются интерпретатором до выполнения кода.
+    Поэтому их можно вызвать до объявления
+
+    3. Функциональное выражение, которое не записывается в переменную, называют анонимной функцией.*/
 
 //============================================================================
-//  __PROTO__ PROTOTYPE
+//  __PROTO__ vs PROTOTYPE
 //============================================================================
+/*__proto__ ссылка на прототип обьекта. (на родительский обьект и так до самого верховного Object.prototype)
+  Prototype - свойство которое есть только у функ. (это почти пустой обьект).
+  то есть он имеет свою собственную ссылку __proto__ на родителя,
+  и свойство constructor которое указывает на саму функцию
+  object.__proto__ === Object.prototype; // true*/
+
 //создание обьекта animal
   var animal = {
     walk: function () {
@@ -481,13 +502,14 @@ $(document).ready(function () {
       return 'Rabbit';
     }
   };
-
+  //rabbit.__proto__ = animal;  //можно назначить наследование сдесь вместо __proto__: animal, вверху. Эквивалентно.
+  //rabbit.__proto__ = Animals.prototype;  // ссылается на прототип класа Animals и имеет только метод move()
   console.log(rabbit.walk(), rabbit.__proto__.walk());
   // --> Rabbit, // --> Animal
 
 //////////////////////////////////////////////
 
-// создание класса Animal
+// создание класса Animals
   function Animals(name) {
     this.name = name;
     this.skills = function () {
@@ -497,14 +519,14 @@ $(document).ready(function () {
 
 // добавление метода move в класс Animals
   Animals.prototype.move = function () {
-    return 'default Animal speed';
+    return 'default Animals speed';
   };
 
-// создание нового обьекта из класса Animal
+// создание нового обьекта из класса Animals
   var cat = new Animals('Murka');
 
   console.log(cat.name, cat.skills(), cat.move());
-  // --> Murka, Jump, default Animal speed
+  // --> Murka, Jump, default Animals speed
   //параметр move берется из прототипа так как собственного нету.
 
 // добавление собственного метода move конкретно данному обьекту cat
@@ -513,32 +535,47 @@ $(document).ready(function () {
   };
 
   console.log(cat.move(), cat.__proto__.move());
-  // --> Murka so fast, default Animal speed
+  // --> Murka so fast, default Animals speed
   //первый move-собственный, второй move-получаем с прототипа
 
 // перезапись свойств метода move в прототипе обьекта cat
   cat.__proto__.move = function () {
-    return 'new Animal speed';
+    return 'new default Animals speed';
   };
 
   console.log(cat.move(), cat.__proto__.move());
-  // --> Murka so fast, new Animal speed
+  // --> Murka so fast, new default Animals speed
   //первый move-собственный, второй move-получаем с прототипа (обновленный)
 
-  //создаем другой клас Fish и обьект от него fish
-  function Fish(name) {
+  //создаем другой клас Tiger и обьект от него tiger
+  function Animals2(name) {
     this.name = name;
   }
-  //в прототип класса Fish назначаем свойства обьекта cat, то есть fish наследуется от cat
-  Fish.prototype = cat;
+  //в прототип класса Animals2 назначаем свойства обьекта cat, то есть tiger наследуется от cat
+  //Animals2.prototype = cat;
 
-  var fish = new Fish('Kambala');
+  var tiger = new Animals2('Sherhan');
 
-  console.log(fish.name, fish.__proto__.name, fish.move());
-  // --> Kambala,  Murka,  Kambala so fast
+  //console.log(tiger.name, tiger.__proto__.name, tiger.move());
+  // --> Sherhan,  Murka,  Sherhan so fast
   // последнее свойство move взято в прототипе (унаследовано от обьекта cat)
+  //------------------------------------------------------------------------
+/* 1. Проверка на эквивалентность
+      cat.__proto__ === Animals.prototype; // true
 
-////////////////////////////////////////////////////////////////////////////
+   2. Присваиваем __proto__ новый объект
+      cat.__proto__ = Animals2.prototype;
+      Теперь cat наследуется непосредственно от Animals2.prototype, а не от Animals.prototype,
+      и теряет свойства, изначально унаследованные от Animals.prototype.
+   -------------------------------------------------------------------------
+   доступ к свойствам прототипа обьекта cat
+      console.log( Object.getPrototypeOf(cat).move() ); // new default Animals speed /  ТИПА альтернативный метод
+   устанавливает прототип
+      Object.setPrototypeOf(cat, tiger); теперь прототипом обьекта cat будет обьект tiger*/
+
+//============================================================================
+//  CALL
+//============================================================================
   /*схема вызова callback функ. для классов.
     function SomeClass(_arg1, _arg2) {
       Parent1.call(this, _arg1);
@@ -550,12 +587,12 @@ $(document).ready(function () {
     и к тому же, позволяющая множественное наследование, по необходимости.*/
 
   function ParentSEX(sex) {
-    this.sex = sex;
+    this.sex = sex;                       //создание свойства sex для будущего обьекта который будет создан из этого класса.
   }
   function ParentAGE(age) {
     this.age = age;
   }
-  function SomeClass(_sex, _age, name) {
+  function User(name, _sex, _age) {
     ParentSEX.call(this, _sex);           //в this находится передаваемый обьект (someObj), sex - аргумент для функ.ParentSEX
     ParentAGE.call(this, _age);
 
@@ -564,12 +601,12 @@ $(document).ready(function () {
     var resume = function () {            //- приватная функция (private), доступна только внутри данной функ.
       return name + _age + _sex + cock;
     };
-    this.getResume = resume();            //доступ к результатам функ resume извне.
+    this.getResume = resume();            //- публичный метод для доступа к результатам функ resume извне.
   }
-  var someObj = new SomeClass('male', 27, 'John');
+  var someObj = new User('John', 'male', 27);
 
   console.log(someObj);
-  //---> Object { sex: "male", age: 27, name: "John", getResume: "John27male32" }
+  //---> Object { name: "John", sex: "male", age: 27, getResume: "John27male32" }
   console.log(someObj.name, someObj.cock, someObj.getResume);
   //---> John,  undefined (потому что private),  John27male32
 
@@ -623,6 +660,52 @@ $(document).ready(function () {
     Из-за этого такую реализацию наследования иногда называют "паразитическим наследованием".
   */
 
+//============================================================================
+//  BIND CALL APPLY,   This - Контекст выполнения функции
+//============================================================================
+  /*Если методы Call() и Apply() позволяют "выполнить" функцию с неким переданым ей контекстом (this) и аргументами.
+  То вот метод Bind() позволяет "связать" функцию с неким переданым ей контекстом (this) и аргументами,
+  что бы выполнить ее позже !!! 
+  -------------------------------------------------------
+  someFunc.call(this, arguments1, arguments2, ... )
+  someFunc.apply(this, [arguments1, arguments2, ...] )
+  -------------------------------------------------------
+  Так можно было бы реализовать передачю контекста без методов call() и apply();
+  function rename(obj, new_name, new_age) {
+    obj.name = new_name;
+    obj.age = new_age;
+  }
+  rename( human, 'Conor', 40 ); 
+  
+  Пример самописной реализации метода bind():
+  function bind(callback, context){
+    return function(){
+      callback.apply(context, arguments);
+    }
+  }
+  let rename_bind = bind(rename, human);
+  rename_bind( 'Conor', 40 );
+  */
+   human = {
+    name:'John',
+    age:16
+  };
+  
+  function rename(new_name, new_age) {
+    this.name = new_name;
+    this.age = new_age;
+  }
+  
+  rename.call( human, 'Conor', 40 );    
+  // первый параметр - контекст (this), последующие - аргументы для функ.
+  rename.apply( human, ['Conor', 40] ); 
+  // этот метод отличается от предыдущего лишь тем, что аргументы передаются в массиве.
+  var rename_bind = rename.bind( human );
+  rename_bind( 'Conor', 40 );
+  // функция rename_bind вызывается просто с аргументами, так как нужный контекст (this) уже был привязан ранее.
+  console.log( human ); 
+  // --> Object { name: "Conor", age: 40 }
+  
 //============================================================================
 //  VALIDATION FORM
 //============================================================================
@@ -711,8 +794,34 @@ $(document).ready(function () {
   //elem - каждый елемент в массиве, FILTER - проходит по всем елем циклом
   //возвращает массив любой длины и уже обработанный, по сути новый массив.
   console.log(myFilter);  // --> [2,3,4]
-  
-  
+
+//============================================================================
+//  TRY, CATCH, THROW, FINALLY
+//============================================================================
+  /*try {
+  .. пробуем выполнить код ..
+  } catch(error) {
+  .. перехватываем исключение ..
+  } finally {
+  .. выполняем всегда ..
+  }*/
+  var data = '{ "name": 30, "age": 30 }';
+  try {
+    var user = JSON.parse(data); // выполнится без ошибок
+    if (!user.name) {
+      throw new SyntaxError("Данные некорректны"); // если не находим name, то искуственно создаем ошибку
+    }
+    //blabla(); // ошибка!
+    // ... если есть ошибка то датьше нее код не выполнится.
+  } catch (error) {  // в error передается обьект с полным описанием ошибки, name, message, stack.
+    if( error.name == "SyntaxError" ){  // если ошибка наша
+      alert( "Извините, в данных ошибка" );  // вывод алерта об ошибке
+    }
+    else{  // если ошибка неизвестная то
+      throw error;  // проброс ошибки дальше, не обрабатывать
+    }
+  }
+
 //============================================================================
 //  TEST SECTION
 //============================================================================
@@ -737,7 +846,7 @@ $(document).ready(function () {
   var result1 = 3 > 4?'Ok':3 > 3?'No':'Else';   // Else
   var result2 = 3 > 2?'Ok':'Else';              // Ok
   console.log(result1, result2);
-  
+
 
 
 
