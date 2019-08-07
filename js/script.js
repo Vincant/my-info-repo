@@ -849,5 +849,57 @@ $(document).ready(function () {
 
 
 
+//============================================================================
+//  VSCODE   Ctrl + Shift + P ---> Developer: Inspect TM Scopes
+//============================================================================
+/*
+"editor.tokenColorCustomizations": {
+  "[One Dark Bimbo]": {
+    "textMateRules": [
+      {
+        "scope": "variable.language, keyword.operator",
+        "settings": {
+            "foreground": "#C594C5"
+        } 
+      },
+      {
+        "scope": "variable.parameter",
+        "settings": {
+            "foreground": "#D4D4D4"
+        }
+      }
+    ]
+    //entity.name.tag                         - thml tag (html + css + JS)
+    //entity.name.tag.html                    - thml tag (html)
+    //entity.name.tag.css                     - thml tag (css)
+    //entity.name.tag.js                      - thml tag (JS)
+    //text.html.derivative                    - html text (html)
+    //entity.other.attribute-name             - attr key, .class #id (html + css)
+    //entity.other.attribute-name.html        - attr key (html)
+    //entity.other.attribute-name.class.css   - .class #id (css)
+    //support.type.property-name.css          - params key (css)
+    //constant.numeric, support.constant,     - params value(css)
+    //keyword.other.unit, constant.other.color
+    //string.quoted.double.html || string     - attr value (html) || string
+    //storage.type                            - func, class, conctructor (JS)
+    //storage.type.function.js                - function (JS)
+    //storage.type.js                         - conctructor, const, let, var (JS)
+    //storage.type.class.js                   - class (JS)
+    //storage.modifier                        - extends
+    //variable.language                       - this, super (JS)
+    //variable                                - variable (JS)
+    //keyword                                 - retutn, import, export, if, else
+    //entity.name.function                    - render(), bind() and athers functions-methods
+    //entity.name.type.class                  - class UserGreeting (class-name) (JS)
+    //support.class                           - <UserGreeting />, console.log() (JS)
+    //variable.parameter                      - props into func (JS)
+    //constant.language                       - true, false, null
+    //keyword.operator                        - new
+    //meta.jsx.children.js || meta.tag        - html text (JS)
+  } 
+}
+*/
+
+
 
 });
